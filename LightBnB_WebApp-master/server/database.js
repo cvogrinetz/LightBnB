@@ -16,18 +16,23 @@ const pool = new Pool({
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-const getUserWithEmail = function(email) {
-  let user;
-  for (const userId in users) {
-    user = users[userId];
-    if (user.email.toLowerCase() === email.toLowerCase()) {
-      break;
-    } else {
-      user = null;
-    }
-  }
-  return Promise.resolve(user);
-}
+
+
+const getUserWithEmail = email => {
+
+  return pool
+    .query(`
+    SELECT id, name, email, password
+    FROM users
+    WHERE email = $1;`, [email])
+    .then(res => {
+      return res.rows[0];
+    })
+    .catch(err => console.error(err.stack));
+};
+
+
+
 exports.getUserWithEmail = getUserWithEmail;
 
 /**
@@ -35,9 +40,22 @@ exports.getUserWithEmail = getUserWithEmail;
  * @param {string} id The id of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-const getUserWithId = function(id) {
-  return Promise.resolve(users[id]);
-}
+
+
+const getUserWithId = id => {
+  
+  return pool
+    .query(`
+    SELECT id, name, email, password
+    FROM users
+    WHERE id = $1;`, [id])
+    .then(res => {
+      return res.rows[0]
+    })
+    .catch(err => console.error(err.stack))
+};
+
+
 exports.getUserWithId = getUserWithId;
 
 
@@ -46,12 +64,28 @@ exports.getUserWithId = getUserWithId;
  * @param {{name: string, password: string, email: string}} user
  * @return {Promise<{}>} A promise to the user.
  */
-const addUser =  function(user) {
-  const userId = Object.keys(users).length + 1;
-  user.id = userId;
-  users[userId] = user;
-  return Promise.resolve(user);
-}
+
+
+const addUser = newObject => {
+
+
+  return pool
+    .query(`
+    INSERT INTO users (name, email, password)
+    VALUES ($1, $2, $3)
+    RETURNING *;
+    `, [newObject.name, newObject.email, newObject.password])
+    .then(res => {
+      return res.rows;
+    })
+    .catch(err => console.error(err.stack))
+};
+
+
+
+
+
+
 exports.addUser = addUser;
 
 /// Reservations
@@ -74,13 +108,6 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
-// const getAllProperties = function(options, limit = 10) {
-//   const limitedProperties = {};
-//   for (let i = 1; i <= limit; i++) {
-//     limitedProperties[i] = properties[i];
-//   }
-//   return Promise.resolve(limitedProperties);
-// }
 
 
 const getAllProperties = (options, limit = 10) => {
