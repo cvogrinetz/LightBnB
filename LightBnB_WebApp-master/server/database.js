@@ -50,9 +50,9 @@ const getUserWithId = id => {
     FROM users
     WHERE id = $1;`, [id])
     .then(res => {
-      return res.rows[0]
+      return res.rows[0];
     })
-    .catch(err => console.error(err.stack))
+    .catch(err => console.error(err.stack));
 };
 
 
@@ -78,13 +78,8 @@ const addUser = newObject => {
     .then(res => {
       return res.rows;
     })
-    .catch(err => console.error(err.stack))
+    .catch(err => console.error(err.stack));
 };
-
-
-
-
-
 
 exports.addUser = addUser;
 
@@ -95,9 +90,7 @@ exports.addUser = addUser;
  * @param {string} guest_id The id of the user.
  * @return {Promise<[{}]>} A promise to the reservations.
  */
-// const getAllReservations = function(guest_id, limit = 10) {
-//   return getAllProperties(null, 2);
-// }
+
 
 const getAllReservations = (guest_id, limit = 10) => {
 
@@ -114,15 +107,11 @@ const getAllReservations = (guest_id, limit = 10) => {
       LIMIT $2;
     `, [guest_id, limit])
     .then(res => {
-      console.log(res.rows)
-      return res.rows
+      console.log(res.rows);
+      return res.rows;
     })
-    .catch(err => console.error(err.stack))
+    .catch(err => console.error(err.stack));
 };
-
-
-
-
   
 exports.getAllReservations = getAllReservations;
 
@@ -136,18 +125,6 @@ exports.getAllReservations = getAllReservations;
  */
 
 
-// const getAllProperties = (options, limit = 10) => {
-  
-//   return pool
-//   .query(`SELECT * FROM properties LIMIT $1`, [limit])
-//   .then((result) => {
-//     return result.rows;
-//   })
-//   .catch((err) => {
-//     console.log(err.message);
-//   });
-// };
-
 
 const getAllProperties = (options, limit = 10) => {
   
@@ -158,31 +135,31 @@ const getAllProperties = (options, limit = 10) => {
   FROM properties
   JOIN property_reviews ON properties.id = property_id`;
 
-  if(options.city) {
+  if (options.city) {
     queryParams.push(`%${options.city}%`);
     queryString += ` WHERE city LIKE $${queryParams.length} `;
   }
   
-  if(options.owner_id) {
+  if (options.owner_id) {
     queryParams.push(`${options.owner_id}`);
     queryString += ` WHERE owner_id = $${queryParams.length} `;
-  } 
+  }
 
-  if(options.minimum_price_per_night && options.maximum_price_per_night) {
+  if (options.minimum_price_per_night && options.maximum_price_per_night) {
     queryParams.push(`${options.minimum_price_per_night}`);
     queryParams.push(`${options.maximum_price_per_night}`);
-    queryString += ` AND cost_per_night > $${queryParams.length - 1} AND cost_per_night < $${queryParams.length} ` 
+    queryString += ` AND cost_per_night > $${queryParams.length - 1} AND cost_per_night < $${queryParams.length} `;
   } else if (!options.minimum_price_per_night && options.maximum_price_per_night) {
-      queryParams.push(`${options.maximum_price_per_night}`);
-      queryString += ` AND cost_per_night < $${queryParams.length} `
-  } else if(!options.maximum_price_per_night && options.minimum_price_per_night) {
-      queryParams.push(`${options.minimum_price_per_night}`)
-      queryString += ` AND cost_per_night > $${queryParams.length} `
-  }   
+    queryParams.push(`${options.maximum_price_per_night}`);
+    queryString += ` AND cost_per_night < $${queryParams.length} `;
+  } else if (!options.maximum_price_per_night && options.minimum_price_per_night) {
+    queryParams.push(`${options.minimum_price_per_night}`);
+    queryString += ` AND cost_per_night > $${queryParams.length} `;
+  }
 
-  if(options.minimum_rating) {
+  if (options.minimum_rating) {
     queryParams.push(`${options.minimum_rating}`);
-    queryString += ` AND property_reviews.rating >= $${queryParams.length}`
+    queryString += ` AND property_reviews.rating >= $${queryParams.length}`;
   }
 
   queryParams.push(limit);
@@ -194,7 +171,7 @@ const getAllProperties = (options, limit = 10) => {
   
   return pool.query(queryString, queryParams).then((res) => {
     return res.rows;
-  })
+  });
 };
 
 
@@ -220,7 +197,7 @@ const addProperty = newObject => {
     .then(res => {
       return res.rows;
     })
-    .catch(err => console.error(err.stack))
+    .catch(err => console.error(err.stack));
 };
 
 
