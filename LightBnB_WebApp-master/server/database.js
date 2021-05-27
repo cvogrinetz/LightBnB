@@ -148,7 +148,48 @@ const getAllProperties = (options, limit = 10) => {
   });
 };
 
+
+// const getAllProperties = (options, limit = 10) => {
+  
+//   const queryParams = [];
+
+//   let queryString = `
+//   SELECT properties.*, AVG(property_reviews.rating) as average_rating
+//   FROM properties
+//   JOIN property_reviews ON properties.id = property_id`;
+
+//   if(options.city) {
+//     queryParams.push(`%${options.city}%`);
+//     queryString += ` WHERE city LIKE $${queryParams.length} `;
+//   } 
+
+
+//   // queryParams.push(`%${options.maximum_price_per_night}%`);
+
+
+//   // console.log('PROPERTIES: ', properties['1'])
+//   // console.log('OWNER ID: ', properties['1'].owner_id)
+  
+  
+//   queryParams.push(limit);
+//   queryString  += `
+//   GROUP BY properties.id
+//   ORDER BY cost_per_night
+//   LIMIT $${queryParams.length}`;
+  
+//   console.log('STRING: ', queryString, 'PARAMS: ', queryParams);
+//   console.log('OPTIONS', options)
+  
+//   return pool.query(queryString, queryParams).then((res) => {
+//     // console.log('RES ROWS: ', res.rows[0].owner_id) 
+//     return res.rows;
+//   })
+// };
+
+
 exports.getAllProperties = getAllProperties;
+
+
 
 
 
@@ -159,10 +200,30 @@ exports.getAllProperties = getAllProperties;
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
-const addProperty = function(property) {
-  const propertyId = Object.keys(properties).length + 1;
-  property.id = propertyId;
-  properties[propertyId] = property;
-  return Promise.resolve(property);
-}
+// const addProperty = function(property) {
+//   const propertyId = Object.keys(properties).length + 1;
+//   property.id = propertyId;
+//   properties[propertyId] = property;
+//   return Promise.resolve(property);
+// }
+
+
+
+const addProperty = newObject => {
+
+
+  return pool
+    .query(`
+    INSERT INTO properties (owner_id, title, description, thumbnail_photo_url, cover_photo_url, cost_per_night, street,city,province,post_code, country, parking_spaces, number_of_bathrooms, number_of_bedrooms)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+    RETURNING *;
+    `, [newObject.owner_id, newObject.title, newObject.description, newObject.thumbnail_photo_url, newObject.cover_photo_url, newObject.cost_per_night, newObject.street,newObject.city,newObject.province, newObject.post_code, newObject.country, newObject.parking_spaces, newObject.number_of_bathrooms, newObject.number_of_bedrooms])
+    .then(res => {
+      return res.rows;
+    })
+    .catch(err => console.error(err.stack))
+};
+
+
+  
 exports.addProperty = addProperty;
